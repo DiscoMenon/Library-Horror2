@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Animations.Rigging;
+using System.Collections.Generic;
+
 
 public class PickUp : MonoBehaviour
 {
@@ -8,7 +10,7 @@ public class PickUp : MonoBehaviour
     [SerializeField] private Rig rightHandRig;
     [SerializeField] private Rig leftHandRig;
 
-    GameObject ovelappedItem;
+    List<GameObject> ovelappedItem = new List<GameObject>();
     [HideInInspector] public GameObject rightEquippedItem;
     [HideInInspector] public GameObject leftEquippedItem;
 
@@ -23,7 +25,11 @@ public class PickUp : MonoBehaviour
 
     public void SetOverlappingItem(GameObject item)
     {
-        ovelappedItem = item; // Store the overlapping item for later use
+        if(item == null)
+        {
+            Debug.Log("No item to set as overlapping.");
+        }
+        ovelappedItem.Add(item); // Store the overlapping item for later use
     }
 
     void OnEnable()
@@ -39,10 +45,10 @@ public class PickUp : MonoBehaviour
 
     private void OnInteractRight(InputAction.CallbackContext context)
     {
-        if (ovelappedItem != null)
+        if (ovelappedItem.Count > 0)
         {
-            rightEquippedItem = ovelappedItem;
-            ovelappedItem = null;
+            rightEquippedItem = ovelappedItem[Random.Range(0, ovelappedItem.Count-1)];
+            ovelappedItem.Remove(rightEquippedItem);
             rightEquippedItem.GetComponent<SphereCollider>().enabled = false;
             rightEquippedItem.transform.SetParent(rightHandSocket);
             rightEquippedItem.transform.localPosition = Vector3.zero;
@@ -54,10 +60,10 @@ public class PickUp : MonoBehaviour
     }
     private void OnInteractLeft(InputAction.CallbackContext context)
     {
-        if (ovelappedItem != null)
+        if (ovelappedItem.Count > 0)
         {
-            leftEquippedItem = ovelappedItem;
-            ovelappedItem = null;
+            leftEquippedItem = ovelappedItem[Random.Range(0, ovelappedItem.Count - 1)];
+            ovelappedItem.Remove(leftEquippedItem);
             leftEquippedItem.GetComponent<SphereCollider>().enabled = false;
             leftEquippedItem.transform.SetParent(leftHandSocket);
             leftEquippedItem.transform.localPosition = Vector3.zero;
